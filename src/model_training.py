@@ -17,7 +17,7 @@ def nn_model_valid(model: models.SalesNN, valid_loader, loss_function, train_tra
             predicted_output = model(inputs)
 
             loss = loss_function(predicted_output, targets)
-            avg_test_loss = train_tracker.step(loss)
+            avg_test_loss = train_tracker.step(loss.item())
     return avg_test_loss
 
 
@@ -63,7 +63,7 @@ def nn_model_train(model: models.SalesNN, train_loader: DataLoader, valid_loader
             loss = loss_function(predicted_output, targets)
             loss.backward()
 
-            train_tracker.step(loss)
+            train_tracker.step(loss.item())
             optimizer.step()
 
         nn_model_valid(model, valid_loader, loss_function, train_tracker, device)
@@ -72,3 +72,4 @@ def nn_model_train(model: models.SalesNN, train_loader: DataLoader, valid_loader
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
+    return train_losses,valid_losses

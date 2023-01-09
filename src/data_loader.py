@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 import pandas as pd
@@ -20,7 +21,8 @@ class NNSalesDataset(Dataset):
         self.sales_data_input = sales_data.to_numpy()
 
     def __getitem__(self, idx):
-        return torch.tensor(self.sales_data_input[idx], dtype=torch.float), torch.tensor(self.sales_data_target[idx],
+        target=np.expand_dims(self.sales_data_target[idx],axis=0)
+        return torch.tensor(self.sales_data_input[idx], dtype=torch.float), torch.tensor(target,
                                                                                          dtype=torch.float)
 
     def __len__(self):

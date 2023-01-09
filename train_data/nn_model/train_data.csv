@@ -1,0 +1,21 @@
+epoch idx from,model architecture,batch_size,optimizer,changed hyperParameters
+1,"SalesNN(
+  (dropout): Dropout(p=0.5, inplace=False)
+  (model): Sequential(
+    (0): Linear(in_features=26, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.5, inplace=False)
+    (3): Linear(in_features=256, out_features=32, bias=True)
+    (4): ReLU()
+    (5): Dropout(p=0.5, inplace=False)
+    (6): Linear(in_features=32, out_features=1, bias=True)
+  )
+)",64,"Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.01
+    maximize: False
+    weight_decay: 0
+)","['model architecture', 'batch_size', 'optimizer']"

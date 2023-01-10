@@ -21,6 +21,7 @@ class SalesNN(nn.Module):
 
         # output layer
         self.model.append(nn.Linear(hidden_shape[-1], output_size))
+        self.model.append(nn.ReLU())
 
     def forward(self, x):
         return self.model(x)

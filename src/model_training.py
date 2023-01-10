@@ -39,7 +39,9 @@ def nn_model_train(model: models.SalesNN, train_loader: DataLoader, valid_loader
 
     valid_size = len(valid_loader), valid_loader.batch_size
 
-    hyperparameters = {"batch_size": train_size[1], "optimizer": optimizer}
+    model_layers = model.hidden_shape + [model.output_size]
+
+    hyperparameters = {"batch_size": train_size[1], "optimizer": optimizer, "model_layers": model_layers}
     if 'notes' in kwargs:
         hyperparameters['notes'] = kwargs['notes']
 
@@ -72,4 +74,4 @@ def nn_model_train(model: models.SalesNN, train_loader: DataLoader, valid_loader
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
-    return train_losses,valid_losses
+    return train_losses, valid_losses

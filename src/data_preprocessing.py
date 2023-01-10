@@ -1,6 +1,7 @@
 import pandas as pd
 
 import datetime
+import numpy as np
 
 
 def store_sales_dtypes(stores_sales_df: pd.DataFrame) -> pd.DataFrame:
@@ -96,6 +97,9 @@ def merge_store_sales(sales_data_df: pd.DataFrame, store_data_df: pd.DataFrame) 
     # set negative values which are the rows that the competitor hasn't opened yet to zero
     merged_data['CompetitionOpenSince'] = merged_data['CompetitionOpenSince'].apply(
         lambda months: months if months > 0 else 0)
+    # log transform
+    merged_data['CompetitionOpenSince'] = merged_data['CompetitionOpenSince'].apply(
+        lambda months: np.log(months) if months > 1 else 0)
 
     # -------------------- isPromoMonth ----------------------
     def is_promo2_month(row):
@@ -114,6 +118,10 @@ def merge_store_sales(sales_data_df: pd.DataFrame, store_data_df: pd.DataFrame) 
             merged_data.Date.dt.month - merged_data.Promo2Since.dt.month)
     merged_data['Promo2Since'] = merged_data.Promo2Since * merged_data.Promo2.astype(int)
     merged_data['Promo2Since'] = merged_data['Promo2Since'].apply(lambda months: months if months > 0 else 0)
+    # log transform
+    merged_data['Promo2Since'] = merged_data['Promo2Since'].apply(
+        lambda months: np.log(months) if months > 1 else 0)
+
     cols = ['year', 'Date', 'PromoInterval', 'CompetitionOpenDate', 'Customers']
     merged_data.drop(cols, axis=1, inplace=True)
     return merged_data
@@ -124,12 +132,14 @@ def hot_encoding(merged_data: pd.DataFrame) -> pd.DataFrame:
     encoding_cols = ['DayOfWeek', 'StateHoliday', 'StoreType', 'Assortment']
     merged_data = pd.get_dummies(merged_data, columns=encoding_cols)
     for col in merged_data.columns:
-        merged_data[col]=merged_data[col].astype(float)
+        merged_data[col] = merged_data[col].astype(float
+                                                   )
+
     return merged_data
 
 
 def drop_closed_days(sales_df: pd.DataFrame) -> pd.DataFrame:
     sales_df = sales_df.copy()
     sales_df = sales_df[sales_df.Open == 1]
-    sales_df.drop('Open', axis=1,inplace=True)
+    sales_df.drop('Open', axis=1, inplace=True)
     return sales_df

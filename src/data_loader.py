@@ -57,7 +57,8 @@ class LSTMSalesDataset(IterableDataset):
 
         self.no_lstm_cols = len(LSTMSalesDataset.lstm_sales_cols)
         self.no_store_data_cols = len(LSTMSalesDataset.lstm_store_cols)
-        self.size=len(store_sales)
+        self.size = len(store_sales)//seq_length
+
     def __iter__(self):
         random.shuffle(self.stores_indices)
 
@@ -104,5 +105,6 @@ class LSTMSalesDataset(IterableDataset):
             stores_data_dict[store_idx]['sales'] = store_sales[sales_cols_list].to_numpy()
             stores_data_dict[store_idx]['data'] = store_data[store_cols_list].to_numpy()
         return stores_data_dict
+
     def __len__(self):
         return self.size

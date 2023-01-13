@@ -32,8 +32,8 @@ class SalesNN(nn.Module):
 
 class SalesLstm(nn.Module):
 
-    def __init__(self, lstm_architecture: dict[str, int],
-                 nn_architecture: list[int], fcn_architecture: list[int],
+    def __init__(self, lstm_architecture: dict,
+                 nn_architecture: list, fcn_architecture: list,
                  dropout_prop=0.5):
         """
         :param lstm_architecture: dict of lstm parameters input_size,hidden_size,num_layers

@@ -122,14 +122,22 @@ def merge_store_sales(sales_data_df: pd.DataFrame, store_data_df: pd.DataFrame) 
     merged_data['Promo2Since'] = merged_data['Promo2Since'].apply(
         lambda months: np.log(months) if months > 1 else 0)
 
-    cols = ['year', 'Date', 'PromoInterval', 'CompetitionOpenDate', 'Customers']
-    merged_data.drop(cols, axis=1, inplace=True)
+    merged_data.sort_values(by='Date', inplace=True)
+
     return merged_data
 
 
-def hot_encoding(merged_data: pd.DataFrame) -> pd.DataFrame:
+def drop_extra_cols(merged_data: pd.DataFrame):
+    cols = ['year', 'Date', 'PromoInterval', 'CompetitionOpenDate', 'Customers']
+    df = merged_data.copy(deep=True)
+    df.drop(cols, axis=1, inplace=True)
+    return df
+
+
+def hot_encoding(merged_data: pd.DataFrame, encoding_cols=None) -> pd.DataFrame:
     merged_data = merged_data.copy(deep=True)
-    encoding_cols = ['DayOfWeek', 'StateHoliday', 'StoreType', 'Assortment']
+    if encoding_cols is None:
+        encoding_cols = ['DayOfWeek', 'StateHoliday', 'StoreType', 'Assortment']
     merged_data = pd.get_dummies(merged_data, columns=encoding_cols)
     for col in merged_data.columns:
         merged_data[col] = merged_data[col].astype(float

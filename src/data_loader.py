@@ -57,7 +57,7 @@ class LSTMSalesDataset(IterableDataset):
 
         self.no_lstm_cols = len(LSTMSalesDataset.lstm_sales_cols)
         self.no_store_data_cols = len(LSTMSalesDataset.lstm_store_cols)
-        self.size = len(store_sales)//seq_length
+        self.size = len(store_sales)-seq_length
 
     def __iter__(self):
         random.shuffle(self.stores_indices)
@@ -66,11 +66,11 @@ class LSTMSalesDataset(IterableDataset):
             store_data = self.stores_data_dict[store_idx]['data']
             store_sales = self.stores_data_dict[store_idx]['sales']
 
-            no_sequences = len(store_sales) // self.seq_length
+            no_sequences = len(store_sales) - self.seq_length
 
             in_idx, out_idx = 0, self.seq_length
-            for i in range(no_sequences - 1):
-                lstm_in = torch.tensor(store_sales[in_idx:in_idx + self.seq_length], dtype=torch.float)
+            for i in range(no_sequences):
+                lstm_in = torch.tensor(store_sales[i:i + self.seq_length], dtype=torch.float)
                 nn_in = torch.tensor(store_data.flatten(), dtype=torch.float)
 
                 in_idx += self.seq_length

@@ -9,7 +9,42 @@
   - `pip install git+https://github.com/ahmedbadr97/train-tracker` i used this package for model train tracking from my repos   
 
 # Table of contents
-1.[Dataset](#Dataset)
+- [Rossmann-Store-Sales](#rossmann-store-sales)
+- [Table of contents](#table-of-contents)
+- [Dataset](#dataset)
+  * [dataset columns](#dataset-columns)
+    + [Sales data](#sales-data)
+    + [Store data](#store-data)
+- [1 Part 1](#1-part-1)
+  * [1.1 missing values](#11-missing-values)
+    + [1.1.1 Competition Distance](#111-competition-distance)
+    + [1.1.2 CompetitionOpenSinceYear,CompetitionOpenSinceMonth](#112-competitionopensinceyear-competitionopensincemonth)
+    + [1.1.2 Promo2 SinceWeek,SinceYear,PromoInterval](#112-promo2-sinceweek-sinceyear-promointerval)
+  * [1.2 EDA](#12-eda)
+    + [1.2.1 Open column](#121-open-column)
+    + [1.2.2 Date,Weekday Field](#122-date-weekday-field)
+      - [Date field](#date-field)
+      - [WeekDay filed](#weekday-filed)
+    + [1.2.3 SchoolHoliday StateHoliday field](#123-schoolholiday-stateholiday-field)
+    + [1.2.4  Promo](#124--promo)
+    + [1.2.5 Store type column , Assortment](#125-store-type-column---assortment)
+      - [1.2.5.1 Store type](#1251-store-type)
+      - [1.2.5.2 Assortment](#1252-assortment)
+    + [1.2.6 Competition OpenSince](#126-competition-opensince)
+    + [1.2.7 Promo2 , Promo2Since](#127-promo2---promo2since)
+  * [1.3 data preprocessing and Feature engineering](#13-data-preprocessing-and-feature-engineering)
+    + [1.3.1 Date column](#131-date-column)
+    + [1.3.2 CompetitionDistance](#132-competitiondistance)
+    + [1.3.3 Promo2Since Year/Week,PromoInterval](#133-promo2since-year-week-promointerval)
+    + [1.3.4 Hot-encoding](#134-hot-encoding)
+- [Part 2 modeling](#part-2-modeling)
+  * [Select best model architecture](#select-best-model-architecture)
+    + [selected model](#selected-model)
+    + [Training](#training)
+    + [model inference](#model-inference)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 # Dataset
 <p align="center"><img src="./notebooks/assets/rosman.jpg" height="350"  alt="rosman"/></p>>
 
@@ -280,7 +315,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 - CompetitionDistance:-> the distance between the store and the competitor in meteors
 - do log transformation to the CompetitionDistance because the distance will vary for the first few kilometers and if the distance grow higher it won't affect much
 
-### 1.3.3 Promo2Since\[Year/Week] , PromoInterval
+### 1.3.3 Promo2Since Year/Week,PromoInterval
 - Promo2Since\[Year/Week] - describes the year and calendar week when the store started participating in Promo2
 - PromoInterval - describes the consecutive intervals Promo2 is started, naming the months the promotion is started anew. E.g. "Feb,May,Aug,Nov" means each round starts in February, May, August, November of any given year for that store
 1. change Promo2Since\[Year/Week] to Date field

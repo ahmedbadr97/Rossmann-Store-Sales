@@ -14,13 +14,13 @@ class SalesNN(nn.Module):
         self.hidden_shape = hidden_shape
 
         self.dropout = nn.Dropout(dropout_prop)
-        self.model = nn.Sequential(nn.Linear(input_size, hidden_shape[0]), nn.ReLU(), nn.Dropout(dropout_prop))
+        self.model = nn.Sequential(nn.Linear(input_size, hidden_shape[0]), nn.ReLU())
 
         # hidden layers
         for i in range(len(hidden_shape) - 1):
             self.model.append(nn.Linear(hidden_shape[i], hidden_shape[i + 1]))
             self.model.append(nn.ReLU())
-            self.model.append(nn.Dropout())
+            self.model.append(nn.Dropout(dropout_prop))
 
         # output layer
         self.model.append(nn.Linear(hidden_shape[-1], output_size))
@@ -93,6 +93,7 @@ class SalesLstm(nn.Module):
 def build_seq_nn(architecture: list, dropout_prop):
     # input layer
     model = nn.Sequential(nn.Linear(architecture[0], architecture[1]), nn.ReLU(), nn.Dropout(dropout_prop))
+    #[8,32]
 
     # hidden layers
     for i in range(1, len(architecture) - 2):

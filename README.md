@@ -34,15 +34,15 @@
   * [1.3 data preprocessing and Feature engineering](#13-data-preprocessing-and-feature-engineering)
     + [1.3.1 Date column](#131-date-column)
     + [1.3.2 CompetitionDistance](#132-competitiondistance)
-    + [1.3.3 Promo2SinceYear,Promo2SinceWeek,PromoInterval](#133-promo2sinceyear-promo2sinceweek-promointerval)
-    + [1.3.4 Hot-encoding](#134-hot-encoding)
+    + [1.3.3 CompetitionSince](#133-competitionsince)
+    + [1.3.4 Promo2SinceYear,Promo2SinceWeek,PromoInterval](#134-promo2sinceyear-promo2sinceweek-promointerval)
+    + [1.3.5 Hot-encoding](#135-hot-encoding)
 - [Part 2 modeling](#part-2-modeling)
   * [Select best model architecture](#select-best-model-architecture)
   * [selected model](#selected-model)
   * [Training](#training)
   * [model inference](#model-inference)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 
@@ -315,18 +315,23 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 
 ### 1.3.2 CompetitionDistance
 <!-- TODO -->
-- CompetitionDistance:-> the distance between the store and the competitor in meteors
+- CompetitionDistance:-> the distance between the store and the competitor in meters
 - do log transformation to the CompetitionDistance because the distance will vary for the first few kilometers and if the distance grow higher it won't affect much
-
-### 1.3.3 Promo2SinceYear,Promo2SinceWeek,PromoInterval
+### 1.3.3 CompetitionSince
+- CompetitionOpenSince\[Month/Year] --> two columns have the year and the month that the nearst competitor had opened
+1. change CompetitionOpenSince\[Year/Month] to Date field
+2. create new CompetitionOpenSince column = no of months from current row date to the date that the nearst competitor had opened
+3. do log transformation to the CompetitionOpenSince because the time will vary for the first few months and if the time passes it won't affect much
+### 1.3.4 Promo2SinceYear,Promo2SinceWeek,PromoInterval
 - Promo2Since\[Year/Week] - describes the year and calendar week when the store started participating in Promo2
 - PromoInterval - describes the consecutive intervals Promo2 is started, naming the months the promotion is started anew. E.g. "Feb,May,Aug,Nov" means each round starts in February, May, August, November of any given year for that store
 1. change Promo2Since\[Year/Week] to Date field
-2. calculate after merging the store-sales and store  data on store id the Promo2Since the Date of the sales  row for each row
-3. Promo2interval
+2. calculate after merging the store-sales and store  data on store id the Promo2Since the Date of the sales  row for each row --> new column Promo2Since = no of months from current row date to the starting of the promo data
+3. do log transformation to the Promo2Since because the time will vary for the first few months and if the time passes it won't affect much
+4. Promo2interval
    - promo2interval is the months that the promo2 is activated if the store is that month 
    - add new column  isPromoMonth to check if the current sales row date.month exists in the store promo2Months if it exists and the sales row date after the pomo2Since date set it to 1 else 0 and 
-### 1.3.4 Hot-encoding
+### 1.3.5 Hot-encoding
 - DayOfWeek (7-columns) for the 7 weekdays 
 - State-Holiday (3-columns) State-Holiday_a for the public holiday State-Holiday_b for Easter holiday , State-Holiday-c for Christmas holiday
 - Store-Type (4-columns) Store-Type-a,Store-Type-b,Store-Type-c

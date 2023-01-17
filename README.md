@@ -9,41 +9,44 @@
   - `pip install git+https://github.com/ahmedbadr97/train-tracker` i used this package for model train tracking from my repos   
 
 # Table of contents
-- [Rossmann-Store-Sales](#rossmann-store-sales)
-- [Table of contents](#table-of-contents)
+
 - [Dataset](#dataset)
   * [dataset columns](#dataset-columns)
     + [Sales data](#sales-data)
     + [Store data](#store-data)
-- [1 Part 1](#1-part-1)
+- [Part 1](#part-1)
   * [1.1 missing values](#11-missing-values)
-    + [1.1.1 Competition Distance](#111-competition-distance)
-    + [1.1.2 CompetitionOpenSinceYear,CompetitionOpenSinceMonth](#112-competitionopensinceyear-competitionopensincemonth)
-    + [1.1.2 Promo2 SinceWeek,SinceYear,PromoInterval](#112-promo2-sinceweek-sinceyear-promointerval)
+    + [1.1.1 Competition Distance column](#111-competition-distance-column)
+    + [1.1.2 CompetitionOpenSinceYear,CompetitionOpenSinceMonth columns](#112-competitionopensinceyear-competitionopensincemonth-columns)
+    + [1.1.2 Promo2 SinceWeek,SinceYear,PromoInterval columns](#112-promo2-sinceweek-sinceyear-promointerval-columns)
   * [1.2 EDA](#12-eda)
     + [1.2.1 Open column](#121-open-column)
-    + [1.2.2 Date,Weekday Field](#122-date-weekday-field)
-      - [Date field](#date-field)
-      - [WeekDay filed](#weekday-filed)
-    + [1.2.3 SchoolHoliday StateHoliday field](#123-schoolholiday-stateholiday-field)
-    + [1.2.4  Promo](#124--promo)
-    + [1.2.5 Store type column , Assortment](#125-store-type-column---assortment)
-      - [1.2.5.1 Store type](#1251-store-type)
-      - [1.2.5.2 Assortment](#1252-assortment)
-    + [1.2.6 Competition OpenSince](#126-competition-opensince)
-    + [1.2.7 Promo2 , Promo2Since](#127-promo2---promo2since)
+    + [1.2.2 Date,Weekday columns](#122-date-weekday-columns)
+      - [Date column](#date-column)
+      - [WeekDay column](#weekday-column)
+    + [1.2.3 SchoolHoliday,StateHoliday columns](#123-schoolholiday-stateholiday-columns)
+    + [1.2.4 Promo](#124-promo)
+    + [1.2.5 StoreType,Assortment columns](#125-storetype-assortment-columns)
+      - [1.2.5.1 Store type column](#1251-store-type-column)
+      - [1.2.5.2 Assortment column](#1252-assortment-column)
+    + [1.2.6 Competition OpenSince column](#126-competition-opensince-column)
+    + [1.2.7 Promo2,Promo2Since columns](#127-promo2-promo2since-columns)
   * [1.3 data preprocessing and Feature engineering](#13-data-preprocessing-and-feature-engineering)
     + [1.3.1 Date column](#131-date-column)
     + [1.3.2 CompetitionDistance](#132-competitiondistance)
-    + [1.3.3 Promo2Since Year/Week,PromoInterval](#133-promo2since-year-week-promointerval)
+    + [1.3.3 Promo2SinceYear,Promo2SinceWeek,PromoInterval](#133-promo2sinceyear-promo2sinceweek-promointerval)
     + [1.3.4 Hot-encoding](#134-hot-encoding)
 - [Part 2 modeling](#part-2-modeling)
   * [Select best model architecture](#select-best-model-architecture)
-    + [selected model](#selected-model)
-    + [Training](#training)
-    + [model inference](#model-inference)
+  * [selected model](#selected-model)
+  * [Training](#training)
+  * [model inference](#model-inference)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
+
+
 
 # Dataset
 <p align="center"><img src="./notebooks/assets/rosman.jpg" height="350"  alt="rosman"/></p>>
@@ -87,25 +90,25 @@
 - Promo2Since\[Year/Week] - describes the year and calendar week when the store started participating in Promo2
 - PromoInterval - describes the consecutive intervals Promo2 is started, naming the months the promotion is started anew. E.g. "Feb,May,Aug,Nov" means each round starts in February, May, August, November of any given year for that store
 
-# 1 Part 1
+# Part 1
 - data cleaning , exploratory data analysis 
 ## 1.1 missing values
 - no missing values in sales data
 - store data missing values in  (CompetitionOpenSinceMonth,CompetitionOpenSinceYear,Promo2SinceWeek,Promo2SinceYear,PromoInterval)
 
 
-### 1.1.1 Competition Distance
+### 1.1.1 Competition Distance column
 <p style="font-size:18px;font-weight:bold">Stores sales sum correlation</p>
 
 <img src="./imgs/stores_sales_corr.png" height=""  alt=",/imgs/.png"/>
 
 - there is an inverse correlation relation between no of customers and Competition Distance
 - so we will fill null values with the least amount that affect the sales which is the max distance
-### 1.1.2 CompetitionOpenSinceYear,CompetitionOpenSinceMonth
+### 1.1.2 CompetitionOpenSinceYear,CompetitionOpenSinceMonth columns
 - CompetitionOpenSinceYear and CompetitionOpenSinceMonth null values are for the same rows
 - fill with the min date in stores sales ,fill year with 2013 and months with 1
 
-### 1.1.2 Promo2 SinceWeek,SinceYear,PromoInterval
+### 1.1.2 Promo2 SinceWeek,SinceYear,PromoInterval columns
 
 - Promo2SinceWeek Promo2SinceYear , PromoInterval are null only when promo2 equals zero ie when the store doesn't have continuous promo intervals
 
@@ -155,14 +158,14 @@ a = public holiday, b = Easter holiday, c = Christmas, 0 = None
 <br><br><br>
 
 ---
-### 1.2.2 Date,Weekday Field
+### 1.2.2 Date,Weekday columns
 - compare months sales in year 2013,2014,2015 , we have 2013,2014, and only first 7 months in 2015
 - check if the sales depend on the time in the year (seasonality)
 - check the avg sales in weekdays
 - we have data for 12 months in 2013,2014, but only first 8 months in 2015
 - split Date to day , month and drop year field
 
-#### Date field
+#### Date column
 <p style="font-size:18px;font-weight:bold">Sales in each month for the 3 years in the data</p>
 <img src="./imgs/sales_date_plt.png" height=""  alt="./imgs/sales_date_plt.png"/>
 
@@ -175,7 +178,7 @@ a = public holiday, b = Easter holiday, c = Christmas, 0 = None
 
 - there is a seasonality in the sales data where the sales are nearly equal in each month in the year
 
-#### WeekDay filed
+#### WeekDay column
 - check the avg sales in weekdays
 
 
@@ -198,7 +201,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <br><br><br>
 
 ---
-### 1.2.3 SchoolHoliday StateHoliday field
+### 1.2.3 SchoolHoliday,StateHoliday columns
 - show the effect of the school holiday and stateHoliday on the sales compared to normal days for randomly selected store
 - change letters of state_holidays to the holiday name for the col encoding
     - (a = public holiday, b = Easter holiday, c = Christmas, 0 = None)
@@ -219,14 +222,14 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <img src="./imgs/schoolday_sales.png" height=""  alt="schoolday_sales.png"/>
 <br><br><br>
 
-### 1.2.4  Promo
+### 1.2.4 Promo
 - Promo - indicates whether a store is running a promo on that day 
 - avg for normal day and promo day for random 5 stores
 
 <img src="./imgs/promo_avg.png" height=""  alt="promo_avg.png"/>
 
 ---
-### 1.2.5 Store type column , Assortment
+### 1.2.5 StoreType,Assortment columns
 - find the percentage of each store type
 - find the avg salary for each store
 - then find the avg of store types a,b,c,d  and for Assortment a,b,c
@@ -235,7 +238,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <img src="./imgs/assort_type.png" height=""  alt="assort_type.png"/>
 <br><br>
 
-#### 1.2.5.1 Store type
+#### 1.2.5.1 Store type column
 - store types count
 
 
@@ -247,7 +250,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <br><br>
 
 ---
-#### 1.2.5.2 Assortment
+#### 1.2.5.2 Assortment column
 - Assortment - describes an assortment level: a = basic, b = extra, c = extended
     - An assortment strategy is a retail industry sales tool that optimizes the variety of goods offered for sale to consumers
 
@@ -271,7 +274,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <br><br>
 
 ---
-### 1.2.6 Competition OpenSince
+### 1.2.6 Competition OpenSince column
 - show for a random store what happened to the avg daily sales when the competition started
 <br><br>
 
@@ -284,7 +287,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 <br><br>
 
 ---
-### 1.2.7 Promo2 , Promo2Since
+### 1.2.7 Promo2,Promo2Since columns
 - promo2 is a column in store data indicates if the store participates in a promo months and promo2Interval indicates the months in names that the store has promo2 in it
 <p style="font-size:25px;font-weight:bold">Avg Sales form Promo month and non Promo month</p>
 
@@ -315,7 +318,7 @@ select random 5 weeks and plot the sales for the 5 weeks days to find if there i
 - CompetitionDistance:-> the distance between the store and the competitor in meteors
 - do log transformation to the CompetitionDistance because the distance will vary for the first few kilometers and if the distance grow higher it won't affect much
 
-### 1.3.3 Promo2Since Year/Week,PromoInterval
+### 1.3.3 Promo2SinceYear,Promo2SinceWeek,PromoInterval
 - Promo2Since\[Year/Week] - describes the year and calendar week when the store started participating in Promo2
 - PromoInterval - describes the consecutive intervals Promo2 is started, naming the months the promotion is started anew. E.g. "Feb,May,Aug,Nov" means each round starts in February, May, August, November of any given year for that store
 1. change Promo2Since\[Year/Week] to Date field
@@ -401,7 +404,7 @@ mean test loss      2458.998964
 ```
 ---
 
-### selected model
+## selected model
 model_architecture.png
 
 <img src="./imgs/model_architecture.png" height=""  alt="model_architecture.png"/>
@@ -423,7 +426,7 @@ SalesNN(
 
 ---
 
-### Training 
+## Training 
 
 <img src="./imgs/model_train.png" height=""  alt="./imgs/model_train.png"/>
 
@@ -434,6 +437,6 @@ root mean squared error = 2087.249890961404
 mean absolute error     = 1511.1308221904264
 ```
 
-### model inference
+## model inference
 - model results on test data
 <img src="./imgs/model_inference.png" height=""  alt="./imgs/model_inference.png"/>

@@ -30,10 +30,20 @@ class SalesNN(nn.Module):
 
 
 class SalesLstm(nn.Module):
+    state_holiday_cols = ['StateHoliday_christmas', 'StateHoliday_easter', 'StateHoliday_public']
+    weekdays_cols = [f"DayOfWeek_{i}" for i in range(1, 8)]
+    store_type_cols = [f"StoreType_{i}" for i in ['a', 'b', 'c', 'd']]
+    assortment_cols = [f"Assortment_{i}" for i in ['a', 'b', 'c']]
+
+    lstm_sales_cols = ['Sales', 'Promo', 'SchoolHoliday', 'month', 'day'] + state_holiday_cols + weekdays_cols
+
+    nn_sales_cols = ['Promo', 'SchoolHoliday', 'month', 'day', 'CompetitionDistance', 'Promo2', 'Promo2Since',
+                     'CompetitionOpenSince',
+                     'isPromoMonth'] + weekdays_cols + state_holiday_cols + store_type_cols + assortment_cols
 
     def __init__(self, lstm_architecture: dict,
                  fcn_architecture: dict,
-                 dropout_prop=0.5):
+                 dropout_prop=None):
         """
         :param lstm_architecture: dict of lstm parameters input_size,hidden_size,num_layers
         :param fcn_architecture: list of fcn_architecture [hidden1,hidden2..,output] input_size=nn_hidden[-1]+lstm_hidden
@@ -41,12 +51,13 @@ class SalesLstm(nn.Module):
         """
         super(SalesLstm, self).__init__()
         self.lstm = nn.LSTM(input_size=lstm_architecture['input_size'], hidden_size=lstm_architecture['hidden_size'],
-                            num_layers=lstm_architecture['num_layers'], batch_first=True, dropout=dropout_prop)
+                            num_layers=lstm_architecture['num_layers'], batch_first=True)
 
         self.lstm_architecture = lstm_architecture
         self.fcn_architecture = fcn_architecture
 
-        self.fcn = build_seq_nn(fcn_architecture['input_size']+lstm_architecture['hidden_size'], fcn_architecture['hidden_shape'], dropout_prop)
+        self.fcn = build_seq_nn(fcn_architecture['input_size'] + lstm_architecture['hidden_size'],
+                                fcn_architecture['hidden_shape'], dropout_prop=dropout_prop)
 
     def _init_hidden(self, batch_size):
         param_iter = self.parameters()
@@ -84,7 +95,7 @@ class SalesLstm(nn.Module):
         return fcn_out, lstm_hidden
 
 
-def build_seq_nn(input_size, hidden_shape: list, dropout_prop, output_size=1):
+def build_seq_nn(input_size, hidden_shape: list, dropout_prop=None, output_size=1):
     # hidden layer
     model = nn.Sequential(nn.Linear(input_size, hidden_shape[0]), nn.ReLU())
 
@@ -92,7 +103,8 @@ def build_seq_nn(input_size, hidden_shape: list, dropout_prop, output_size=1):
     for i in range(len(hidden_shape) - 1):
         model.append(nn.Linear(hidden_shape[i], hidden_shape[i + 1]))
         model.append(nn.ReLU())
-        model.append(nn.Dropout(dropout_prop))
+        if dropout_prop is not None:
+            model.append(nn.Dropout(dropout_prop))
 
     # output layer
     model.append(nn.Linear(hidden_shape[-1], output_size))

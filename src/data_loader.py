@@ -100,6 +100,7 @@ class LSTMSalesDataset(IterableDataset):
         self.no_nn_cols = len(LSTMSalesDataset.nn_sales_cols)
 
         self.size = self.get_size()
+        self.current_store = 0
 
         # sequences
 
@@ -115,6 +116,7 @@ class LSTMSalesDataset(IterableDataset):
         nn_sales_cols = list(self.nn_sales_cols.values())
         for store_idx in self.stores_indices:
             store_sales = self.stores_data_dict[store_idx]
+            self.current_store = store_idx
 
             # out starts from seq_len +1 but we are zero based so seq_len +1 -1 = seq_len
             out_idx = self.seq_length
@@ -142,7 +144,11 @@ class LSTMSalesDataset(IterableDataset):
         stores_idx = merged_sales_dataset.Store.unique()
         stores_data_dict = {}
         for store_idx in stores_idx:
-            stores_data_dict[store_idx] = merged_sales_dataset[merged_sales_dataset.Store == store_idx].to_numpy()
+            store_sales = merged_sales_dataset[
+                merged_sales_dataset.Store == store_idx]
+            store_sales=store_sales.loc[:,merged_sales_dataset.columns != 'Store']
+
+            stores_data_dict[store_idx] = store_sales.to_numpy()
 
         return stores_data_dict
 

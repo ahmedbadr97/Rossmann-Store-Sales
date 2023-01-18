@@ -127,8 +127,9 @@ def merge_store_sales(sales_data_df: pd.DataFrame, store_data_df: pd.DataFrame) 
     return merged_data
 
 
-def drop_extra_cols(merged_data: pd.DataFrame):
-    cols = ['year', 'Date', 'PromoInterval', 'CompetitionOpenDate', 'Customers']
+def drop_extra_cols(merged_data: pd.DataFrame,cols=None):
+    if cols is None:
+        cols = ['year', 'Date', 'PromoInterval', 'CompetitionOpenDate', 'Customers']
     df = merged_data.copy(deep=True)
     df.drop(cols, axis=1, inplace=True)
     return df

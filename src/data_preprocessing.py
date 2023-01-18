@@ -53,7 +53,7 @@ def store_data_prep(store_data_df: pd.DataFrame) -> pd.DataFrame:
     # ------------------- Competition Distance Col ------------------------
     store_data_df['CompetitionDistance'] = store_data_df['CompetitionDistance'].fillna(
         store_data_df['CompetitionDistance'].max())
-    store_data_df['CompetitionDistance'] = store_data_df['CompetitionDistance'] / 1000.0
+    store_data_df['CompetitionDistance'] = np.log(store_data_df['CompetitionDistance'])
 
     # ----------Competition OpenSinceYear/Month to CompetitionOpen date filed-----------
 

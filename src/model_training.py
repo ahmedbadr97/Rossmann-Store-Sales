@@ -84,10 +84,10 @@ def lstm_test(model: models.SalesLstm, valid_loader, loss_function, train_tracke
     train_tracker.valid()
     with torch.no_grad():
         hidden = None
-        for sales_in, store_data_in, targets in valid_loader:
-            sales_in, store_data_in, targets = sales_in.to(device), store_data_in.to(device), targets.to(device)
+        for lstm_in, nn_in, targets in valid_loader:
+            lstm_in, nn_in, targets = lstm_in.to(device), nn_in.to(device), targets.to(device)
 
-            predicted_output, hidden = model(sales_in, store_data_in, hidden)
+            predicted_output, hidden = model(lstm_in, nn_in, hidden)
 
             loss = loss_function(predicted_output, targets)
             avg_test_loss = train_tracker.step(loss.item())
@@ -118,13 +118,12 @@ def lstm_train(model: models.SalesLstm, train_loader: DataLoader, valid_loader: 
     valid_size = len(valid_loader), valid_loader.batch_size
 
     lstm_layers = model.lstm_architecture
-    nn_layers = model.nn_architecture
-    fc_output_layer = model.fcn_architecture
+    fcn_architecture = model.fcn_architecture
 
     seq_len = train_loader.dataset.seq_length
 
     hyperparameters = {"batch_size": train_size[1], "optimizer": optimizer, "lstm_layers": lstm_layers,
-                       "nn_layers": nn_layers, "fc_output_layer": fc_output_layer, "seq_len": seq_len,
+                       "fcn_architecture": fcn_architecture, "seq_len": seq_len,
                        "grad_clip": grad_clip}
 
     if 'notes' in kwargs:
@@ -145,10 +144,10 @@ def lstm_train(model: models.SalesLstm, train_loader: DataLoader, valid_loader: 
         model.train()
         train_tracker.train()
         hidden = None
-        for sales_in, store_data, targets in train_loader:
-            sales_in, store_data, targets = sales_in.to(device), store_data.to(device), targets.to(device)
+        for lstm_in, nn_in, targets in train_loader:
+            lstm_in, nn_in, targets = lstm_in.to(device), nn_in.to(device), targets.to(device)
 
-            predicted_output, hidden = model(sales_in, store_data, hidden)
+            predicted_output, hidden = model(lstm_in, nn_in, hidden)
 
             loss = loss_function(predicted_output, targets)
             loss.backward()

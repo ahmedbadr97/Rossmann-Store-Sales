@@ -13,7 +13,6 @@ class SalesNN(nn.Module):
         self.output_size = output_size
         self.hidden_shape = hidden_shape
 
-        self.dropout = nn.Dropout(dropout_prop)
         self.model = nn.Sequential(nn.Linear(input_size, hidden_shape[0]), nn.ReLU())
 
         # hidden layers
@@ -33,11 +32,10 @@ class SalesNN(nn.Module):
 class SalesLstm(nn.Module):
 
     def __init__(self, lstm_architecture: dict,
-                 nn_architecture: list, fcn_architecture: list,
+                 fcn_architecture: dict,
                  dropout_prop=0.5):
         """
         :param lstm_architecture: dict of lstm parameters input_size,hidden_size,num_layers
-        :param nn_architecture: list of nn_architecture [input_size,hidden1,hidden2..,output]
         :param fcn_architecture: list of fcn_architecture [hidden1,hidden2..,output] input_size=nn_hidden[-1]+lstm_hidden
         :param dropout_prop: probability of the dropout
         """
@@ -45,13 +43,10 @@ class SalesLstm(nn.Module):
         self.lstm = nn.LSTM(input_size=lstm_architecture['input_size'], hidden_size=lstm_architecture['hidden_size'],
                             num_layers=lstm_architecture['num_layers'], batch_first=True, dropout=dropout_prop)
 
-        self.store_data_nn = build_seq_nn(nn_architecture, dropout_prop)
-
-        fcn_architecture = [lstm_architecture['hidden_size'] + nn_architecture[-1]] + fcn_architecture
-        self.fcn = build_seq_nn(fcn_architecture, dropout_prop)
         self.lstm_architecture = lstm_architecture
         self.fcn_architecture = fcn_architecture
-        self.nn_architecture = nn_architecture
+
+        self.fcn = build_seq_nn(fcn_architecture['input_size']+lstm_architecture['hidden_size'], fcn_architecture['hidden_shape'], dropout_prop)
 
     def _init_hidden(self, batch_size):
         param_iter = self.parameters()
@@ -81,27 +76,25 @@ class SalesLstm(nn.Module):
 
         # store_data_nn in batch_size , input_size
         # store_data_nn out batch_size , hidden_size
-        store_data_out = self.store_data_nn(nn_in)
 
-        fcn_in = torch.cat((lstm_out, store_data_out), dim=1)
+        fcn_in = torch.cat((nn_in, lstm_out), dim=1)
 
         fcn_out = self.fcn(fcn_in)
 
         return fcn_out, lstm_hidden
 
 
-def build_seq_nn(architecture: list, dropout_prop):
-    # input layer
-    model = nn.Sequential(nn.Linear(architecture[0], architecture[1]), nn.ReLU(), nn.Dropout(dropout_prop))
-    #[8,32]
+def build_seq_nn(input_size, hidden_shape: list, dropout_prop, output_size=1):
+    # hidden layer
+    model = nn.Sequential(nn.Linear(input_size, hidden_shape[0]), nn.ReLU())
 
     # hidden layers
-    for i in range(1, len(architecture) - 2):
-        model.append(nn.Linear(architecture[i], architecture[i + 1]))
+    for i in range(len(hidden_shape) - 1):
+        model.append(nn.Linear(hidden_shape[i], hidden_shape[i + 1]))
         model.append(nn.ReLU())
-        model.append(nn.Dropout())
+        model.append(nn.Dropout(dropout_prop))
 
     # output layer
-    model.append(nn.Linear(architecture[-2], architecture[-1]))
+    model.append(nn.Linear(hidden_shape[-1], output_size))
     model.append(nn.ReLU())
     return model

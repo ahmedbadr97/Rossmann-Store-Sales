@@ -113,17 +113,13 @@ class LSTMSalesDataset(IterableDataset):
 
     def __iter__(self):
         random.shuffle(self.stores_indices)
-        lstm_sales_cols_lst, nn_sales_cols_lst = self.get_columns_list()
         for store_idx in self.stores_indices:
+
+            lstm_sales, nn_sales, out_sales = self.stores_data_dict[store_idx]
             self.current_store = store_idx
-            store_sales = self.stores_data_dict[store_idx]
             # out starts from seq_len +1 but we are zero based so seq_len +1 -1 = seq_len
             out_idx = self.seq_length
-            no_sequences = (len(store_sales) - self.seq_length)
-
-            lstm_sales = store_sales[lstm_sales_cols_lst].to_numpy()
-            nn_sales = store_sales[nn_sales_cols_lst].to_numpy()
-            out_sales = store_sales['Store'].to_numpy()
+            no_sequences = (len(out_sales) - self.seq_length)
 
             for i in range(no_sequences):
                 # from window_idx to seq_len (slicing end is exclusive)
@@ -146,9 +142,14 @@ class LSTMSalesDataset(IterableDataset):
     def get_sales_store_data(self, merged_sales_dataset):
         # get store id
         stores_idx = merged_sales_dataset.Store.unique()
+        lstm_sales_cols_lst, nn_sales_cols_lst = self.get_columns_list()
         stores_data_dict = {}
         for store_idx in stores_idx:
-            stores_data_dict[store_idx] = merged_sales_dataset[merged_sales_dataset.Store == store_idx]
+            store_sales = merged_sales_dataset[merged_sales_dataset.Store == store_idx]
+
+            stores_data_dict[store_idx] = (
+                store_sales[lstm_sales_cols_lst].to_numpy(), store_sales[nn_sales_cols_lst].to_numpy(),
+                store_sales['Sales'].to_numpy())
 
         return stores_data_dict
 

@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -93,6 +94,24 @@ class SalesLstm(nn.Module):
         fcn_out = self.fcn(fcn_in)
 
         return fcn_out, lstm_hidden
+
+    @staticmethod
+    def to_tensor(df_input):
+        numpy_input = df_input.to_numpy()
+        numpy_input = np.expand_dims(numpy_input, axis=0)
+        return torch.tensor(numpy_input, dtype=torch.float)
+
+    def predict(self, prev_data, new_data, hidden=None, device='cpu'):
+        lstm_data = self.to_tensor(prev_data[self.lstm_sales_cols])
+        lstm_data=lstm_data.to(device)
+
+        nn_data = self.to_tensor(new_data[self.nn_sales_cols])
+        nn_data = nn_data.to(device)
+        self.eval()
+
+        with torch.no_grad():
+            out, hidden = self.forward(lstm_data, nn_data, hidden)
+        return out, hidden
 
 
 def build_seq_nn(input_size, hidden_shape: list, dropout_prop=None, output_size=1):

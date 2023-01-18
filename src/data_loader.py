@@ -76,7 +76,8 @@ class LSTMSalesDataset(IterableDataset):
 
     nn_sales_cols = ['Promo', 'SchoolHoliday', 'month', 'day', 'CompetitionDistance', 'Promo2', 'Promo2Since',
                      'CompetitionOpenSince',
-                     'isPromoMonth'] + weekdays_cols + state_holiday_cols + store_type_cols + assortment_cols
+                     'isPromoMonth'] + weekdays_cols + state_holiday_cols + store_type_cols + assortment_cols + [
+                    ]
 
     lstm_sales_cols = {col_name: idx for idx, col_name in enumerate(lstm_sales_cols)}
     nn_sales_cols = {col_name: idx for idx, col_name in enumerate(nn_sales_cols)}
@@ -112,45 +113,54 @@ class LSTMSalesDataset(IterableDataset):
 
     def __iter__(self):
         random.shuffle(self.stores_indices)
-        lstm_sales_cols = list(self.lstm_sales_cols.values())
-        nn_sales_cols = list(self.nn_sales_cols.values())
+        lstm_sales_cols_lst, nn_sales_cols_lst = self.get_columns_list()
         for store_idx in self.stores_indices:
-            store_sales = self.stores_data_dict[store_idx]
             self.current_store = store_idx
-
+            store_sales = self.stores_data_dict[store_idx]
             # out starts from seq_len +1 but we are zero based so seq_len +1 -1 = seq_len
             out_idx = self.seq_length
             no_sequences = (len(store_sales) - self.seq_length)
+
+            lstm_sales = store_sales[lstm_sales_cols_lst].to_numpy()
+            nn_sales = store_sales[nn_sales_cols_lst].to_numpy()
+            out_sales = store_sales['Store'].to_numpy()
+
             for i in range(no_sequences):
                 # from window_idx to seq_len (slicing end is exclusive)
                 # past rows
-                lstm_in = torch.tensor(store_sales[i:i + self.seq_length, lstm_sales_cols], dtype=torch.float)
+
+                lstm_in = torch.tensor(lstm_sales[i:i + self.seq_length], dtype=torch.float)
 
                 # future row
                 # get the sales column only
-                out = store_sales[out_idx, self.lstm_sales_cols['Sales']]
+                out = out_sales[out_idx]
 
                 out = np.expand_dims(out, axis=0)
                 out = torch.tensor(out, dtype=torch.float)
 
-                nn_in = torch.tensor(store_sales[out_idx, nn_sales_cols], dtype=torch.float)
+                nn_in = torch.tensor(nn_sales[out_idx], dtype=torch.float)
                 out_idx += 1
 
                 yield lstm_in, nn_in, out
 
     def get_sales_store_data(self, merged_sales_dataset):
-
         # get store id
         stores_idx = merged_sales_dataset.Store.unique()
         stores_data_dict = {}
         for store_idx in stores_idx:
-            store_sales = merged_sales_dataset[
-                merged_sales_dataset.Store == store_idx]
-            store_sales=store_sales.loc[:,merged_sales_dataset.columns != 'Store']
-
-            stores_data_dict[store_idx] = store_sales.to_numpy()
+            stores_data_dict[store_idx] = merged_sales_dataset[merged_sales_dataset.Store == store_idx]
 
         return stores_data_dict
+
+    def get_columns_list(self):
+        lstm_sales_cols_lst = [None] * len(self.lstm_sales_cols)
+        for col_name, col_idx in self.lstm_sales_cols.items():
+            lstm_sales_cols_lst[col_idx] = col_name
+
+        nn_sales_cols_lst = [None] * len(self.nn_sales_cols)
+        for col_name, col_idx in self.nn_sales_cols.items():
+            nn_sales_cols_lst[col_idx] = col_name
+        return lstm_sales_cols_lst, nn_sales_cols_lst
 
     def __len__(self):
         return self.size

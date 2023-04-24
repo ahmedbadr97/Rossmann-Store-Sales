@@ -62,7 +62,7 @@
 
 ## dataset columns
 ### Sales data
-<img src="./imgs/store_sales.JPG" height=""  alt="./imgs/.png"/> <br><br>
+<img src="./imgs/store_data.JPG" height=""  alt="./imgs/.png"/> <br><br>
 
 
 - Id - an Id that represents a (Store, Date) duple within the test set
@@ -78,7 +78,7 @@
 - Promo - indicates whether a store is running a promo on that day  
 
 ### Store data
-<img src="./imgs/store_data.JPG" height=""  alt="./imgs/.png"/> <br><br>
+<img src="./imgs/store_sales.JPG" height=""  alt="./imgs/.png"/> <br><br>
 
 
 - StoreType - differentiates between 4 different store models: a, b, c, d
